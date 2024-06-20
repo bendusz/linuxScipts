@@ -6,13 +6,11 @@ sudo apt update
 # Install necessary packages
 sudo apt install -y realmd sssd sssd-tools libnss-sss libpam-sss adcli samba-common-bin oddjob oddjob-mkhomedir packagekit krb5-user
 
-# Configure Kerberos
-echo "Please enter your Kerberos realm (e.g., EXAMPLE.COM):"
-read KRB_REALM
-echo "Please enter your KDC server (e.g., kdc.example.com):"
-read KDC_SERVER
-echo "Please enter your admin server (e.g., admin.example.com):"
-read ADMIN_SERVER
+# Join the server to the Active Directory domain
+echo "Please enter the domain (e.g., example.com):"
+read DOMAIN
+echo "Please enter your Domain server (e.g., dc.example.com):"
+read DC_SERVER
 
 cat <<EOL | sudo tee /etc/krb5.conf
 [libdefaults]
@@ -21,19 +19,21 @@ cat <<EOL | sudo tee /etc/krb5.conf
     dns_lookup_kdc = true
 
 [realms]
-    $KRB_REALM = {
-        kdc = $KDC_SERVER
-        admin_server = $ADMIN_SERVER
+    $DOMAIN = {
+        kdc = $DC_SERVER
+        admin_server = $DC_SERVER
     }
 
 [domain_realm]
-    .example.com = $KRB_REALM
-    example.com = $KRB_REALM
+    .example.com = $DOMAIN
+    example.com = $DOMAIN
 EOL
 
-# Join the server to the Active Directory domain
-echo "Please enter the domain (e.g., example.com):"
-read DOMAIN
+echo "#########################################################"
+echo "#########################################################"
+echo "#########################################################"
+echo "#########################################################"
+
 echo "Please enter the domain admin user:"
 read ADMIN_USER
 echo "Please enter the domain admin password:"
